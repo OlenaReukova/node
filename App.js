@@ -2,7 +2,20 @@ const fs = require ('fs');
 const express = require ('express');
 
 const app = express();
-app.use(express.json()); //Middleware
+//Middleware
+app.use(express.json()); 
+
+//Middleware
+app.use((req,res,next)=>{
+  console.log('Hello from the middleware');
+  next();
+})
+
+//Middleware
+app.use((req, res, next)=>{
+  req.requestTime = new Date().toISOString();
+  next();
+});
 
 // app.get('/', (req, res) => {
 //     res
@@ -19,8 +32,10 @@ const tours =JSON.parse(
 );
 
 const getAllTours = (req, res)=>{
+  console.log(req.requestTime);
   res.status(200).json({
       status: 'succes',
+      requestedAt: req.requestTime,
       results: tours.length,
       data:{
           tours
