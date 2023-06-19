@@ -28,6 +28,35 @@ app.get('/api/v1/tours', (req, res)=>{
     });
 });
 
+app.get('/api/v1/tours/:id', (req, res)=>{
+  console.log(req.params);
+  
+  const id = req.params.id*1; //it is a trick to convert string into number
+  
+  const tour =tours.find(el => el.id === id); //find the tours by id. we used java .find method for array
+  
+  
+  // if (id>tours.length)  
+  if (!tour)
+  {
+    return res.status(404).json(
+      {
+        status:'fail',
+        message: 'Invalid ID'
+      }
+    );
+  }
+  
+  
+  res.status(200).json({
+      status: 'succes',
+      data:{
+          tours: tour
+      }
+  });
+});
+
+
 app.post('/api/v1/tours', (req, res) => {
     // console.log(req.body);
     const newId = tours[tours.length - 1].id + 1;
