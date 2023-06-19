@@ -18,17 +18,17 @@ const tours =JSON.parse(
     fs.readFileSync(`${__dirname}/4-natours/after-section-06/dev-data/data/tours-simple.json`)
 );
 
-app.get('/api/v1/tours', (req, res)=>{
-    res.status(200).json({
-        status: 'succes',
-        results: tours.length,
-        data:{
-            tours
-        }
-    });
-});
+const getAllTours = (req, res)=>{
+  res.status(200).json({
+      status: 'succes',
+      results: tours.length,
+      data:{
+          tours
+      }
+  });
+};
 
-app.get('/api/v1/tours/:id', (req, res)=>{
+const getTour =(req, res)=>{
   console.log(req.params);
   
   const id = req.params.id*1; //it is a trick to convert string into number
@@ -54,55 +54,71 @@ app.get('/api/v1/tours/:id', (req, res)=>{
           tours: tour
       }
   });
-});
+}
 
+const createTour = (req, res) => {
+  // console.log(req.body);
+  const newId = tours[tours.length - 1].id + 1;
+  const newTour = Object.assign({ id: newId }, req.body);
 
-app.post('/api/v1/tours', (req, res) => {
-    // console.log(req.body);
-    const newId = tours[tours.length - 1].id + 1;
-    const newTour = Object.assign({ id: newId }, req.body);
-  
-    tours.push(newTour);
-    fs.writeFile(`${__dirname}/4-natours/after-section-06/dev-data/data/tours-simple.json`, JSON.stringify(tours), err => {
-      res.status(201).json({
-        status: 'success',
-        data: {
-          tour: newTour
-        }
-      });
-    });
-  });
-  
-  app.patch('/api/v1/tours/:id', (req, res)=>{
-    console.log(req.body);
-    if (req.params.id * 1 > tours.length){return res.status(404).json({
-        status:'fail',
-        message: 'Invalid ID'
-      });
-    }
-    
-    res.status(200).json({
+  tours.push(newTour);
+  fs.writeFile(`${__dirname}/4-natours/after-section-06/dev-data/data/tours-simple.json`, JSON.stringify(tours), err => {
+    res.status(201).json({
       status: 'success',
       data: {
-        tour: 'Updated tour here...',
-      },
+        tour: newTour
+      }
     });
   });
-  
-  app.delete('/api/v1/tours/:id', (req, res)=>{
-    console.log(req.body);
-    if (req.params.id * 1 > tours.length){return res.status(404).json({
-        status:'fail',
-        message: 'Invalid ID'
-      });
-    }
-    
-    res.status(204).json({
-      status: 'success',
-      data: null,
+}
+
+const updateTour =(req, res)=>{
+  console.log(req.body);
+  if (req.params.id * 1 > tours.length){return res.status(404).json({
+      status:'fail',
+      message: 'Invalid ID'
     });
-  });
+  }
   
+  res.status(200).json({
+    status: 'success',
+    data: {
+      tour: 'Updated tour here...',
+    },
+  });
+}
+
+const deleteTour=(req, res)=>{
+  console.log(req.body);
+  if (req.params.id * 1 > tours.length){return res.status(404).json({
+      status:'fail',
+      message: 'Invalid ID'
+    });
+  }
+  
+  res.status(204).json({
+    status: 'success',
+    data: null,
+  });
+}
+
+// app.get('/api/v1/tours', getAllTours);
+// app.get('/api/v1/tours/:id', getTour);
+// app.post('/api/v1/tours', createTour);
+// app.patch('/api/v1/tours/:id', updateTour );
+// app.delete('/api/v1/tours/:id', deleteTour);
+  
+app
+.route('/api/v1/tours')
+.get(getAllTours)
+.post(createTour)
+
+app
+.route('/api/v1/tours/:id')
+.get(getTour)
+.patch(updateTour)
+.delete(deleteTour);
+
 const port = 3000;
 app.listen(port, ()=> {
     console.log(`App running on port ${port}...`);
